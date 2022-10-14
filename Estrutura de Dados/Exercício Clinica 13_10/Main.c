@@ -27,6 +27,8 @@ typedef struct {
 
 int menuPrincipal();
 void cadastrarPaciente(paciente *paciente, int numIndice);
+void pacientesCadastrados(paciente *paciente, int numIndice);
+void consultaCadastrada(consulta *consulta, int numConsulta, int numPaciente);
 
 int main(){
     int numIndice = -1;
@@ -34,6 +36,8 @@ int main(){
     paciente paciente[100];
     consulta consulta[300];
     int numConsulta = -1;
+    int leitura = 0;
+    int cancela = 0;
 
     while(1){
         numeroEscolha = 0;
@@ -46,21 +50,21 @@ int main(){
         else if(numeroEscolha == 1){
             //Cadastrar
             printf("\n");
-            numIndice++;
-            cadastrarPaciente(&paciente[numIndice], numIndice);            
+            leitura = 0;
+            printf("Digite 1 para cadastrar um novo paciente ou -1 para voltar ao menu\n");
+            scanf("%d", &leitura);
+            if(leitura == 1){
+                numIndice++;
+                cadastrarPaciente(&paciente[numIndice], numIndice);  
+            }      
         }
         
         else if(numeroEscolha == 2){
             //Nova Cosulta
             printf("\n");
-            printf("----------------ABRIR NOVA CONSULTA-----------------");
+            printf("----------------ABRIR NOVA CONSULTA-----------------\n");
 
-            printf("Pacientes Cadastrados\n");
-            if(numIndice >= 0){
-                for(int i = 0; i<=numIndice; i++){
-                    printf("Cadastro %d - %s", paciente[i].codPac, paciente[i].nome);
-                }
-            }
+            pacientesCadastrados(paciente, numIndice);
             
             while(1){
                 printf("Digite o Codigo do Paciente ou -1 para sair\n");
@@ -68,36 +72,51 @@ int main(){
                 scanf("%d", &numPaciente);
                 if(numPaciente == -1){
                     break;
-                }else if(numPaciente >= 0 && numPaciente <= numIndice){
-                    printf("Criando Nova Consulta para o Paciente %d - %s", paciente[numPaciente].codPac, paciente[numPaciente].nome);
+                }
+                else if(numPaciente >= 0 && numPaciente <= numIndice){
+                    printf("\nCriando Nova Consulta para o Paciente %d - %s", paciente[numPaciente].codPac, paciente[numPaciente].nome);
                     numConsulta++;
                     consulta[numConsulta].codConsulta = numConsulta;
                     consulta[numConsulta].codPac = paciente[numPaciente].codPac;
-                    printf("Digite a Data da Consulta (DD MM AAAA)");
-                    scanf("%d", &consulta[numConsulta].data.dia);
-                    scanf("%d", &consulta[numConsulta].data.mes);
-                    scanf("%d", &consulta[numConsulta].data.ano);
 
+                    while(1){
+                        printf("Digite a Data da Consulta (DD MM AAAA)\n");
+                        scanf("%d", &consulta[numConsulta].data.dia);
+                        scanf("%d", &consulta[numConsulta].data.mes);
+                        scanf("%d", &consulta[numConsulta].data.ano);
 
-                    int cancela = 0;
-                    for(int i = 0; i<numConsulta; i++){
-                        if(numPaciente == consulta[i].codPac){
-                            if(consulta[i].data.dia == consulta[numConsulta].data.dia && consulta[i].data.mes == consulta[numConsulta].data.mes && consulta[i].data.ano == consulta[numConsulta].data.ano){
-                                printf("Paciente já possui consulta marcada esse dia");
-                                cancela = 1;
+                        cancela = 0;
+                        for(int i = 0; i<numConsulta; i++){
+                            if(numPaciente == consulta[i].codPac){
+                                if(consulta[i].data.dia == consulta[numConsulta].data.dia && consulta[i].data.mes == consulta[numConsulta].data.mes && consulta[i].data.ano == consulta[numConsulta].data.ano){
+                                    printf("ERRO!!!\nPACIENTE JA POSSUI CONSULTA NESSE DIA\n");
+                                    printf("Se quiser mudar a data digite 1, se quiser voltar ao menu digite 2\n");
+                                    leitura = 0;
+                                    scanf("%d", &leitura);
+                                    if(leitura == 1){
+                                        cancela = 1;
+                                    }else{
+                                        cancela = 2;
+                                        break;
+                                    }
+                                }
                             }
                         }
+                        if(cancela != 1){
+                            break;
+                        }                            
                     }
 
-                    if(cancela == 1){
+                    if(cancela == 2){
                         numConsulta--;
-                        break;
+                    }else{
+                        printf("Digite o Horario da Consulta (HH MM SS)\n");
+                        scanf("%d", &consulta[numConsulta].horario.hora);
+                        scanf("%d", &consulta[numConsulta].horario.minutos);
+                        scanf("%d", &consulta[numConsulta].horario.segundos);
                     }
                     
-                    printf("Digite o Horario da Consulta (HH MM SS)");
-                    scanf("%d", &consulta[numConsulta].horario.hora);
-                    scanf("%d", &consulta[numConsulta].horario.minutos);
-                    scanf("%d", &consulta[numConsulta].horario.segundos);
+                    
                     break;
                 }
                 else{
@@ -117,21 +136,61 @@ int main(){
         else if(numeroEscolha == 3){
             //Cosultar atendimentos
             printf("\n");
-            //printf
-        
+            pacientesCadastrados(paciente, numIndice);
+            leitura = 0;
+            printf("Digite o numero do paciente que deseja consultar os agendamentos\n");
+            scanf("%d", &leitura);
+            consultaCadastrada(consulta, numConsulta, leitura);
         }
         
         else if(numeroEscolha == 4){
-            //Alterar dados de uma consulta
+            //Alterar o horario de uma consulta
             printf("\n");
+            pacientesCadastrados(paciente, numIndice);
+            leitura = 0;
+            printf("Digite o numero do paciente que deseja alterar os agendamentos\n");
+            scanf("%d", &leitura);
+            consultaCadastrada(consulta, numConsulta, leitura);
+            printf("Digite a consulta a ser alterada\n");
+            scanf("%d", &leitura);
+            for(int i = 0; i<=numConsulta; i++){
+                if(consulta[i].codConsulta == leitura){
+                    printf("Consulta %d - %d/%d/%d - %d:%d:%d sendo alterada\n", consulta[i].codConsulta, consulta[i].data.dia, consulta[i].data.mes, consulta[i].data.ano, consulta[i].horario.hora, consulta[i].horario.minutos, consulta[i].horario.segundos);
+                   
+                    printf("Digite o novo Horario da Consulta (HH MM SS)\n");
+                    scanf("%d", &consulta[i].horario.hora);
+                    scanf("%d", &consulta[i].horario.minutos);
+                    scanf("%d", &consulta[i].horario.segundos);
+                }
+            }
 
         }
-
-
-
     }
 
     return 0;
+}
+
+void consultaCadastrada(consulta *consulta, int numConsulta, int numPaciente){
+    printf("Consultas Agendadas:\n");
+    int achado = 0;
+    for(int i = 0; i<=numConsulta; i++){
+        if(consulta[i].codPac == numPaciente){
+            printf("Consulta %d - %d/%d/%d - %d:%d:%d\n", consulta[i].codConsulta, consulta[i].data.dia, consulta[i].data.mes, consulta[i].data.ano, consulta[i].horario.hora, consulta[i].horario.minutos, consulta[i].horario.segundos);
+            achado = 1;
+        }
+    }
+    if(achado == 0){
+        printf("Nenhuma Consulta foi achado nesse Paciente ou Paciente nao existente\n");
+    }
+}
+
+void pacientesCadastrados(paciente *paciente, int numIndice){
+    printf("Pacientes Cadastrados\n");
+    if(numIndice >= 0){
+        for(int i = 0; i<=numIndice; i++){
+            printf("Cadastro %d - %s", paciente[i].codPac, paciente[i].nome);
+        }
+    }
 }
 
 int menuPrincipal(){
