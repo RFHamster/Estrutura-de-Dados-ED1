@@ -153,17 +153,13 @@ int main(){
             consultaCadastrada(consulta, numConsulta, leitura);
             printf("Digite a consulta a ser alterada\n");
             scanf("%d", &leitura);
-            for(int i = 0; i<=numConsulta; i++){
-                if(consulta[i].codConsulta == leitura){
-                    printf("Consulta %d - %d/%d/%d - %d:%d:%d sendo alterada\n", consulta[i].codConsulta, consulta[i].data.dia, consulta[i].data.mes, consulta[i].data.ano, consulta[i].horario.hora, consulta[i].horario.minutos, consulta[i].horario.segundos);
-                   
-                    printf("Digite o novo Horario da Consulta (HH MM SS)\n");
-                    scanf("%d", &consulta[i].horario.hora);
-                    scanf("%d", &consulta[i].horario.minutos);
-                    scanf("%d", &consulta[i].horario.segundos);
-                }
-            }
 
+            printf("Consulta %d - %d/%d/%d - %d:%d:%d sendo alterada\n", consulta[leitura].codConsulta, consulta[leitura].data.dia, consulta[leitura].data.mes, consulta[leitura].data.ano, consulta[leitura].horario.hora, consulta[leitura].horario.minutos, consulta[leitura].horario.segundos);
+                   
+            printf("Digite o novo Horario da Consulta (HH MM SS)\n");
+            scanf("%d", &consulta[leitura].horario.hora);
+            scanf("%d", &consulta[leitura].horario.minutos);
+            scanf("%d", &consulta[leitura].horario.segundos);
         }
     }
 
