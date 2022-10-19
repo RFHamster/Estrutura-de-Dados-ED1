@@ -1,4 +1,5 @@
-#include <stdio.h>
+ #include <stdio.h>
+#include <conio.h>
 
 typedef struct {
     int codPac;
@@ -32,7 +33,7 @@ void consultaCadastrada(consulta *consulta, int numConsulta, int numPaciente);
 
 int main(){
     int numIndice = -1;
-    int numeroEscolha = 0;
+    int numeroEscolha = 0;  
     paciente paciente[100];
     consulta consulta[300];
     int numConsulta = -1;
@@ -44,24 +45,28 @@ int main(){
         numeroEscolha = menuPrincipal();
         
         if(numeroEscolha == 5){
+            system("cls");
+            printf("Desligando o Sistema");
             break;
         }
         
         else if(numeroEscolha == 1){
             //Cadastrar
-            printf("\n");
+            system("cls");
             leitura = 0;
             printf("Digite 1 para cadastrar um novo paciente ou -1 para voltar ao menu\n");
             scanf("%d", &leitura);
             if(leitura == 1){
                 numIndice++;
                 cadastrarPaciente(&paciente[numIndice], numIndice);  
-            }      
+                printf("\nPaciente Cadastrado, pressione ENTER para voltar ao MENU\n");
+                getch();
+            }
         }
         
         else if(numeroEscolha == 2){
             //Nova Cosulta
-            printf("\n");
+            system("cls");
             printf("----------------ABRIR NOVA CONSULTA-----------------\n");
 
             pacientesCadastrados(paciente, numIndice);
@@ -135,31 +140,34 @@ int main(){
         
         else if(numeroEscolha == 3){
             //Cosultar atendimentos
-            printf("\n");
+            system("cls");
             pacientesCadastrados(paciente, numIndice);
             leitura = 0;
             printf("Digite o numero do paciente que deseja consultar os agendamentos\n");
             scanf("%d", &leitura);
             consultaCadastrada(consulta, numConsulta, leitura);
+            printf("\nPressione ENTER para sair\n");
+            getch();
+            
         }
         
         else if(numeroEscolha == 4){
             //Alterar o horario de uma consulta
-            printf("\n");
+            system("cls");
             pacientesCadastrados(paciente, numIndice);
             leitura = 0;
             printf("Digite o numero do paciente que deseja alterar os agendamentos\n");
             scanf("%d", &leitura);
             consultaCadastrada(consulta, numConsulta, leitura);
-            printf("Digite a consulta a ser alterada\n");
+            printf("Digite o numero da consulta a ser alterada\n");
             scanf("%d", &leitura);
-
             printf("Consulta %d - %d/%d/%d - %d:%d:%d sendo alterada\n", consulta[leitura].codConsulta, consulta[leitura].data.dia, consulta[leitura].data.mes, consulta[leitura].data.ano, consulta[leitura].horario.hora, consulta[leitura].horario.minutos, consulta[leitura].horario.segundos);
                    
             printf("Digite o novo Horario da Consulta (HH MM SS)\n");
             scanf("%d", &consulta[leitura].horario.hora);
             scanf("%d", &consulta[leitura].horario.minutos);
             scanf("%d", &consulta[leitura].horario.segundos);
+
         }
     }
 
@@ -191,6 +199,7 @@ void pacientesCadastrados(paciente *paciente, int numIndice){
 
 int menuPrincipal(){
     int numeroEscolha;
+    system("cls");
     printf("-------------------------MENU-------------------------\n");
     printf("DIGITE 1 CADASTRAR UM NOVO PACIENTE\n");
     printf("DIGITE 2 PARA ENTRAR COM UMA NOVA CONSULTA\n");
