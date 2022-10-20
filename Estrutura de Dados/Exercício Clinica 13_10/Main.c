@@ -1,4 +1,4 @@
- #include <stdio.h>
+#include <stdio.h>
 #include <conio.h>
 
 typedef struct {
@@ -30,6 +30,8 @@ int menuPrincipal();
 void cadastrarPaciente(paciente *paciente, int numIndice);
 void pacientesCadastrados(paciente *paciente, int numIndice);
 void consultaCadastrada(consulta *consulta, int numConsulta, int numPaciente);
+void dataValida(consulta *consulta);
+void horaValida(consulta *consulta);
 
 int main(){
     int numIndice = -1;
@@ -89,6 +91,7 @@ int main(){
                         scanf("%d", &consulta[numConsulta].data.dia);
                         scanf("%d", &consulta[numConsulta].data.mes);
                         scanf("%d", &consulta[numConsulta].data.ano);
+                        dataValida(&consulta[numConsulta]);
 
                         cancela = 0;
                         for(int i = 0; i<numConsulta; i++){
@@ -119,9 +122,8 @@ int main(){
                         scanf("%d", &consulta[numConsulta].horario.hora);
                         scanf("%d", &consulta[numConsulta].horario.minutos);
                         scanf("%d", &consulta[numConsulta].horario.segundos);
+                        horaValida(&consulta[numConsulta]);
                     }
-                    
-                    
                     break;
                 }
                 else{
@@ -167,6 +169,10 @@ int main(){
             scanf("%d", &consulta[leitura].horario.hora);
             scanf("%d", &consulta[leitura].horario.minutos);
             scanf("%d", &consulta[leitura].horario.segundos);
+            horaValida(&consulta[leitura]);
+
+            printf("Consulta Alterada Pressione ENTER para voltar ao menu\n");
+            getch();
 
         }
     }
@@ -222,4 +228,103 @@ void cadastrarPaciente(paciente *paciente, int numIndice){
     setbuf(stdin, NULL);
     fgets(paciente->telefone, 15, stdin);
     printf("\n");
+}
+
+void dataValida(consulta *consulta){
+    int d, m, a;
+    int valida = 0;
+    int day = 0, month = 0, year = 0;
+
+    while(valida == 0){
+        if(consulta->data.dia > 30 || consulta->data.dia < 1){
+            printf("Dia Invalido! Digite Novamente\n");
+            scanf("%d", &d);
+            (*consulta).data.dia = d;
+            if(consulta->data.dia > 30 || consulta->data.dia < 1){
+                valida = 0;
+            }else{
+                valida = 1;
+            }
+        }else{
+            day = 1;
+        }
+        if(consulta->data.mes > 12 || consulta->data.mes < 1){
+            printf("Mes Invalido! Digite Novamente\n");
+            scanf("%d", &m);
+            (*consulta).data.mes = m;
+            if(consulta->data.mes > 12 || consulta->data.mes < 1){
+                valida = 0;            
+            }else{
+                valida = 1;
+            }
+        }else{
+            month = 1;
+        }
+        if(consulta->data.ano < 2022){
+            valida = 0;
+            printf("Ano Invalido! Digite Novamente\n");
+            scanf("%d", &a);
+            (*consulta).data.ano = a;
+            if(consulta->data.ano < 2022){
+                valida = 0;
+            }else{
+                valida = 1;
+            }
+        }else{
+            year = 1;
+        }
+
+        if(day == 1 && month == 1 && year == 1){
+            valida = 1;
+        }
+    }
+}
+
+void horaValida(consulta *consulta){
+    int h, m, s;
+    int valida = 0;
+    int seg = 0, min = 0, hour = 0;
+
+    while(valida == 0){
+        if(consulta->horario.segundos > 60 || consulta->data.dia < 1){
+            printf("Segundos Invalido! Digite Novamente\n");
+            scanf("%d", &s);
+            (*consulta).horario.segundos = s;
+            if(consulta->horario.segundos > 60 || consulta->data.dia < 1){
+                valida = 0;
+            }else{
+                valida = 1;
+            }
+        }else{
+            seg = 1;
+        }
+        if(consulta->horario.minutos > 60 || consulta->horario.minutos < 1){
+            printf("Minuto Invalido! Digite Novamente\n");
+            scanf("%d", &m);
+            (*consulta).horario.minutos = m;
+            if(consulta->horario.minutos > 60 || consulta->horario.minutos < 1){
+                valida = 0;
+            }else{
+                valida = 1;
+            }
+        }else{
+            min = 1;
+        }
+        if(consulta->horario.hora > 24 || consulta->horario.hora < 1){
+            printf("Hora Invalida! Digite Novamente\n");
+            scanf("%d", &h);
+            (*consulta).horario.hora = h;
+            if(consulta->horario.hora > 24 || consulta->horario.hora < 1){
+                valida = 0;
+            }else{
+                valida = 1;
+            }
+        }else{
+            hour = 1;
+        }
+
+        if(seg == 1 && min == 1 && hour == 1){
+            valida = 1;
+        }
+    }
 }
