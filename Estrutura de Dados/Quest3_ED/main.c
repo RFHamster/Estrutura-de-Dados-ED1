@@ -25,7 +25,6 @@ void linhas(){
     printf("\n------------------------------------");
 }
 
-
 int insere_listaDesconto(Desconto **lista, char placa[]){
     Desconto *novo = malloc(sizeof(Desconto));
 
@@ -182,6 +181,32 @@ float mostrarHora(Carro *lista, char placa[]){
     return 0;
 }
 
+void trocaString(char *str1, char *str2, size_t tamanho){
+    static char aux[15];
+    memcpy(aux, str1, tamanho);
+    memcpy(str1, str2, tamanho);
+    memcpy(str2, aux, tamanho);
+}
+
+void attLista(Carro *lista){
+    Carro *p;
+    p = lista;
+    while(p){
+        Carro *aux = p->prox;
+        while(aux){
+            if(p->horaEntrada < aux->horaEntrada){
+                float hora_temp = p->horaEntrada;
+                p->horaEntrada = aux->horaEntrada;
+                aux->horaEntrada = hora_temp;
+                trocaString(p->placa, aux->placa, 8);
+                trocaString(p->vaga, aux->vaga, 2);
+            }
+            aux = aux->prox;
+        }
+        p = p->prox;
+    }
+}
+
 void menu();
 
 int main (){
@@ -214,6 +239,7 @@ int main (){
             printf("Pressione ENTER para sair\n");
             getch();
             break;
+
         case 3:
             system("cls");
             int random = rand() % 2;
@@ -233,8 +259,8 @@ int main (){
             lista_todosDesconto(listaDesconto);
             printf("Digite ENTER para sair");
             getch();
-           
             break;
+
         case 4:
             system("cls");
             printf("\nDigite a placa do veiculo a ser removido(7 caracteres): \n");
@@ -261,9 +287,14 @@ int main (){
             printf("Digite ENTER para sair");
             getch();
             break;
+
         case 5:
+            attLista(garagem);
             printf("\nLista atualizada!!!\n");
+            printf("Digite ENTER para sair");
+            getch();
             break;
+
         default:
             if (op != 0){
                 printf("\nValor invalido!\n");
