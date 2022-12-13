@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<conio.h>
+#include<string.h>
+#include<math.h>
 
 typedef struct no{
     char placa[8];
@@ -9,19 +11,56 @@ typedef struct no{
     struct no *prox;
 }Carro;
 
-Carro *inicio;
-
 typedef struct no_des{
     char placa[8];
-    char vaga[2];
     float desconto;
     struct no_des *prox;
 }Desconto;
 
-int Pagamentos = 0;
+float VALORHORA = 8;
+float Pagamentos = 0;
+float desconto = 2.0;
 
-void insere_lista(Carro **lista){
-    Carro *aux, *novo = malloc(sizeof(Carro));
+void linhas(){
+    printf("\n------------------------------------");
+}
+
+
+int insere_listaDesconto(Desconto **lista, char placa[]){
+    Desconto *novo = malloc(sizeof(Desconto));
+
+    if(novo){
+        linhas();
+        printf("\n        Cadastrar Desconto");
+        linhas();
+
+        strcpy(novo->placa, placa);
+        novo->desconto = desconto;
+        desconto += 0.25;
+        if(desconto > 8){
+            desconto = 2.0;
+        }
+        novo->prox = NULL;
+
+        if(*lista == NULL){
+           novo->prox = NULL;
+        }
+        else{
+            novo->prox = *lista;
+        }
+        *lista = novo;
+        printf("\nDesconto cadastrado para placa %s de R$ %.2f\n", novo->placa, novo->desconto);
+        return 1;
+    }
+    else{
+        printf("\nNao foi possivel, memoria estourou");
+        return 0;
+    }
+        
+}
+
+int insere_lista(Carro **lista){
+    Carro *novo = malloc(sizeof(Carro));
 
     if(novo){
         linhas();
@@ -45,19 +84,20 @@ void insere_lista(Carro **lista){
         novo->prox = NULL;
 
         if(*lista == NULL){
-            *lista = novo;
+           novo->prox = NULL;
         }
         else{
-            aux = *lista;
-            while(aux->prox){
-                aux = aux->prox;
-            }
-            aux->prox = novo;
+            novo->prox = *lista;
         }
+        *lista = novo;
+        return 1;
         
     }
-    else
+    else{
         printf("\nNao foi possivel, memoria estourou");
+        return 0;
+    }
+        
 }
 
 void lista_todos(Carro *novo)
@@ -77,28 +117,81 @@ void lista_todos(Carro *novo)
     printf("\n==============================================================\n");
 }
 
-void remove_lista(Carro *p){
+void lista_todosDesconto(Desconto *novo){
+    printf("\nDesconto Aplicado:");
+    printf("\n==============================================================");
+    while(novo){
+        printf("\nSaida (placa): %s com R$ %.2f de desconto", novo->placa, novo->desconto);
 
-    if(inicio == NULL){
+        novo = novo->prox;
+    }
+    printf("\n==============================================================\n");
+}
+
+void remove_lista(Carro **lista, char placa[]){
+    Carro *p;
+    Carro *q;
+    p = (*lista)->prox;
+    q = *lista;
+    
+    if(*lista == NULL){
+        printf("Garagem sem Carros\n");
         return;
     }
-    else{
-        while(inicio != NULL){
-            p = inicio;
-            printf("\nCarro removido: %s", p->placa);
-            inicio = p->prox;
-            free(p);
+    if(strcmp(placa, q->placa) == 0){
+        *lista = (*lista)->prox;
+        return;
+    }else{
+        int liberta = 1;
+        while(liberta != 0){
+            if(strcmp(placa, p->placa) == 0){
+                q->prox = p->prox;
+                free(p);
+                liberta = 0;
+            }else{
+                p = p->prox;
+                q = q->prox;
+            }
         }
     }
 }
 
-void linhas();
+float mostrarDesconto(Desconto *lista, char placa[]){
+    Desconto *p;
+    p = lista;
+    while(p){
+        if(strcmp(placa, p->placa) == 0){
+            return p->desconto;
+        }else{
+            p = p->prox;
+        }
+    }
+    return 0;
+}
+
+float mostrarHora(Carro *lista, char placa[]){
+    Carro *p;
+    p = lista;
+    while(p){
+        if(strcmp(placa, p->placa) == 0){    
+            return p->horaEntrada;
+        }else{
+            p = p->prox;
+        }
+    }
+    return 0;
+}
+
 void menu();
 
 int main (){
     int op;
-
+    int carrosGaragem = 0;
+    int aux = 0;
+    char placaCarro[8];
     Carro *garagem;
+    Desconto *listaDesconto;
+    listaDesconto = NULL;
     garagem = NULL;
 
     do{
@@ -109,7 +202,10 @@ int main (){
         {
         case 1:
             system("cls");
-            insere_lista(&garagem);
+            aux = insere_lista(&garagem);
+            if(aux == 1){
+                carrosGaragem++;
+            }
             break;
 
         case 2:
@@ -119,16 +215,55 @@ int main (){
             getch();
             break;
         case 3:
-            printf("\nDesconto aplicado!!!\n");
-        
-        case 4:
-            
+            system("cls");
+            int random = rand() % 2;
+            Carro *auxiliar;
+            auxiliar = garagem;
+            listaDesconto = NULL;
+            int i = 0;
+            while(auxiliar != NULL){
+                if((random % 2 == 0) & (i % 2 == 0)){
+                    insere_listaDesconto(&listaDesconto, auxiliar->placa);
+                }else if((random % 2 != 0) & (i % 2 != 0)){
+                    insere_listaDesconto(&listaDesconto, auxiliar->placa);
+                }
+                i++;
+                auxiliar = auxiliar->prox;
+            }
+            lista_todosDesconto(listaDesconto);
+            printf("Digite ENTER para sair");
+            getch();
+           
             break;
-
+        case 4:
+            system("cls");
+            printf("\nDigite a placa do veiculo a ser removido(7 caracteres): \n");
+            setbuf(stdin, NULL);
+            fgets(placaCarro, 8, stdin);
+            float descontoCarro = mostrarDesconto(listaDesconto, placaCarro);
+            printf("Digite a hora Atual: (HH MM)\n");
+            float hora, minutos;
+            scanf("%f", &hora);
+            scanf("%f", &minutos);
+            float horaAtual = hora + (minutos/60);
+            float horaPassada = mostrarHora(garagem, placaCarro);
+            if(truncf(horaPassada) != 0){
+                if(horaAtual - horaPassada > 0){
+                    Pagamentos += ((horaAtual - horaPassada) * VALORHORA) - descontoCarro;
+                }else{
+                    Pagamentos += ((horaAtual - horaPassada) * VALORHORA);
+                }
+                remove_lista(&garagem, placaCarro);
+                printf("Pagamento Atualizado Total: R$ %.2f\n", Pagamentos);  
+            }else{
+                printf("Carro nao Cadastrado\n");
+            }
+            printf("Digite ENTER para sair");
+            getch();
+            break;
         case 5:
             printf("\nLista atualizada!!!\n");
             break;
-            
         default:
             if (op != 0){
                 printf("\nValor invalido!\n");
@@ -139,9 +274,7 @@ int main (){
     return 0;
 }
 
-void linhas(){
-    printf("\n------------------------------------");
-}
+
 
 void menu(){
     system("cls");
