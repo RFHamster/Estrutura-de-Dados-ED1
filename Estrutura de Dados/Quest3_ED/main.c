@@ -121,7 +121,6 @@ void lista_todosDesconto(Desconto *novo){
     printf("\n==============================================================");
     while(novo){
         printf("\nSaida (placa): %s com R$ %.2f de desconto", novo->placa, novo->desconto);
-
         novo = novo->prox;
     }
     printf("\n==============================================================\n");
@@ -181,29 +180,38 @@ float mostrarHora(Carro *lista, char placa[]){
     return 0;
 }
 
-void trocaString(char *str1, char *str2, size_t tamanho){
-    static char aux[15];
-    memcpy(aux, str1, tamanho);
-    memcpy(str1, str2, tamanho);
-    memcpy(str2, aux, tamanho);
-}
-
-void attLista(Carro *lista){
+void attLista(Carro **lista, int carrosGaragem){
+    if(*lista == NULL || (*lista)->prox == NULL){
+        return;
+    }
     Carro *p;
-    p = lista;
-    while(p){
-        Carro *aux = p->prox;
-        while(aux){
-            if(p->horaEntrada < aux->horaEntrada){
-                float hora_temp = p->horaEntrada;
-                p->horaEntrada = aux->horaEntrada;
-                aux->horaEntrada = hora_temp;
-                trocaString(p->placa, aux->placa, 8);
-                trocaString(p->vaga, aux->vaga, 2);
-            }
-            aux = aux->prox;
+    Carro *a;
+    Carro *aux;
+    for(int i = 0; i < carrosGaragem; i++){
+        aux = *lista;
+        p = aux->prox;
+        a = p->prox;
+        if(aux->horaEntrada < p->horaEntrada){
+            *lista = p;
+            aux->prox = p->prox;
+            p->prox = aux;
         }
-        p = p->prox;
+        aux = *lista;
+        p = aux->prox;
+        while(a != NULL){
+            if(p->horaEntrada < a->horaEntrada){
+                aux->prox = a;
+                p->prox = a->prox;
+                a->prox = p;
+                a = a->prox->prox;
+                aux = aux->prox;
+            }else{
+                aux = aux->prox;
+                p = p->prox;
+                a = a->prox;
+            }
+            
+        }
     }
 }
 
@@ -280,6 +288,7 @@ int main (){
                     Pagamentos += ((horaAtual - horaPassada) * VALORHORA);
                 }
                 remove_lista(&garagem, placaCarro);
+                carrosGaragem--;
                 printf("Pagamento Atualizado Total: R$ %.2f\n", Pagamentos);  
             }else{
                 printf("Carro nao Cadastrado\n");
@@ -289,7 +298,8 @@ int main (){
             break;
 
         case 5:
-            attLista(garagem);
+            printf("%d carros na garagem", carrosGaragem);
+            attLista(&garagem, carrosGaragem);
             printf("\nLista atualizada!!!\n");
             printf("Digite ENTER para sair");
             getch();
