@@ -58,6 +58,24 @@ void imprimeFila(Fila *fi){
     }
 }
 
+int removeFila(Fila *fi){
+    Elem *no;
+    int dado;
+
+    if(fi->fim == NULL){
+        return 0;
+    }
+
+    no = fi->inicio;
+    fi->inicio = fi->inicio->prox;
+    dado = no->dados;
+
+    if(fi->inicio == NULL){
+        fi->fim = NULL;
+    }
+    free(no);
+    return dado;
+}
 void menu();
 
 int main (){
