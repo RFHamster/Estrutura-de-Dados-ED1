@@ -95,10 +95,51 @@ float Pagamentos = 0;
         while(p){
             hora = truncf(p->horaEntrada);
             minutos  = (p->horaEntrada - hora) * 60;
-            printf("\nSaida: O condutor(a) %s, com o carro de placa %s entrou as %f:%f", p->nome, p->placa, hora, minutos);
+            printf("\nSaida: O condutor(a) %s, com o carro de placa %s entrou as %.0f:%.0f", p->nome, p->placa, hora, minutos);
             p = p->anterior;
         }
         printf("\n");
+    }
+
+    void removeLista(Carro **lista, char placa[]){
+        Carro *aux;
+        aux = *lista;
+        if(*lista == NULL){
+            printf("GARAGEM VAZIA\n");
+            return;
+        }
+        while(strcmp(aux->placa, placa) != 0){
+            aux = aux->proximo;
+            if(aux == NULL){
+                printf("PLACA INEXISTENTE\n");
+                return;
+            }
+        }
+        if(aux->anterior == NULL && aux->proximo == NULL){
+            *lista = NULL;
+        }else{
+            if(aux->anterior == NULL){
+                *lista = aux->proximo;
+                aux->proximo->anterior = NULL;
+            }else if(aux->proximo == NULL){
+                aux->anterior->proximo = NULL;
+            }else{
+                aux->anterior->proximo = aux->proximo;
+                aux->proximo->anterior = aux->anterior;
+            }
+        }
+        printf("Digite a hora de saida HH MM\n");
+        float hora;
+        float minutos;
+        scanf("%f", &hora);
+        scanf("%f", &minutos);
+        float HoraTotal = hora + (minutos/60);
+        HoraTotal = HoraTotal - aux->horaEntrada;
+        Pagamentos = Pagamentos + (VALORHORA * HoraTotal);
+        printf("Pagamento de %.2f reais efetuado\n", (VALORHORA * HoraTotal));
+        printf("Pagamentos do dia = %.2f\n", Pagamentos);
+        printf("Condutor %s da placa %s removido\n", aux->nome, aux->placa);
+        free(aux);
     }
 
 void menu();
@@ -106,6 +147,7 @@ void menu();
 int main(){
     Carro *garagem;
     garagem = NULL;
+    int recebe = 1;
     Carro *info;
     int escolha = 1;
     while(escolha != 0){
@@ -114,7 +156,7 @@ int main(){
         switch (escolha){
         case 1:
             system("cls");
-            int recebe = 1;
+            recebe = 1;
             while(recebe != 0){
                 printf("Digite 0 para parar de ler");
                 scanf("%d", &recebe);
@@ -142,7 +184,14 @@ int main(){
             getch();
         break;
         case 4:
-
+            system("cls");
+            printf("Digite a placa a ser removida\n");
+            char placa[8];
+            setbuf(stdin,NULL);
+            fgets(placa,8,stdin);
+            removeLista(&garagem, placa);
+            printf("Pressione ENTER para sair");
+            getch();
         break;
         default:
             escolha = 0;
