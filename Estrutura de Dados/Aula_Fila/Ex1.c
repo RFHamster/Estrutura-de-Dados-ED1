@@ -81,6 +81,9 @@ void ImprimeFila(Fila *F){
     for(int i = F->inicio; i<F->fim; i++){
         printf(" %d ", F->item[i]);
     }
+    if(F->inicio == F->fim){
+        printf("Fila Vazia\n");
+    }
     printf("\n");
 }
 
